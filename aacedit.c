@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
 
 	printf("AAC ADTS Editor version 0.1 alpha 3 add 3\n");
 	if (!getoptions(argc, argv))
-		errorexit("ƒIƒvƒVƒ‡ƒ“‚ª³‚µ‚­‚ ‚è‚Ü‚¹‚ñB", TRUE);
+		errorexit("ã‚ªãƒ—ã‚·ãƒ§ãƒ³ãŒæ­£ã—ãã‚ã‚Šã¾ã›ã‚“ã€‚", TRUE);
 
 	if (options.outputpath) {
 		avsopen(options.avspath);
 		hWriteAACFile = open(options.outputpath, (O_RDWR | O_BINARY | O_CREAT), (S_IRUSR | S_IWUSR));
 		if (hWriteAACFile < 0) {
-			errorexit("o—Íƒtƒ@ƒCƒ‹ƒI[ƒvƒ“‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+			errorexit("å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«ã‚ªãƒ¼ãƒ—ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 			return 0;
 		}
 	}
@@ -63,72 +63,72 @@ int main(int argc, char *argv[])
 	for (i = 0; i < options.inputfile; i++) {
 		aacdata = aacdatalist[i] = (AACDATA *)calloc(1, sizeof(AACDATA));
 		if (aacdata == NULL)
-			errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+			errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 		if (aacopen(options.inputpath[i], aacdata) == 2) {
-			printf("%s ‚ÍƒtƒŒ[ƒ€ƒhƒƒbƒv‚µ‚Ä‚¢‚é‰Â”\«‚ª‚ ‚è‚Ü‚·B\n", options.inputpath[i]);
+			printf("%s ã¯ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ‰ãƒ­ãƒƒãƒ—ã—ã¦ã„ã‚‹å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚\n", options.inputpath[i]);
 			editok = FALSE;
 		}
 		aacheader = aacdata->header;
-		printf("%s ‚Ìî•ñ:\n", options.inputpath[i]);
+		printf("%s ã®æƒ…å ±:\n", options.inputpath[i]);
 #if !defined(_WIN32)
-		printf("  ƒTƒCƒY:       %zu ƒoƒCƒg\n", aacdata->size);
+		printf("  ã‚µã‚¤ã‚º:       %zu ãƒã‚¤ãƒˆ\n", aacdata->size);
 #else
-		printf("  ƒTƒCƒY:       %u ƒoƒCƒg\n", aacdata->size);
+		printf("  ã‚µã‚¤ã‚º:       %u ãƒã‚¤ãƒˆ\n", aacdata->size);
 #endif
-		printf("  ƒtƒŒ[ƒ€:     %u ƒtƒŒ[ƒ€\n", aacdata->framecnt);
+		printf("  ãƒ•ãƒ¬ãƒ¼ãƒ :     %u ãƒ•ãƒ¬ãƒ¼ãƒ \n", aacdata->framecnt);
 		second = (unsigned int)((double)aacdata->framecnt / ((double)aacheader->sampling_rate / 1024));
-		printf("  ŠÔ:         %02u:%02u:%02u\n", second / 3600, second / 60 % 60, second % 60);
+		printf("  æ™‚é–“:         %02u:%02u:%02u\n", second / 3600, second / 60 % 60, second % 60);
 		bitrate = (unsigned int)((double)aacdata->size * 8 * ((double)aacheader->sampling_rate / 1024) / aacdata->framecnt + 0.5);
-		printf("  ƒrƒbƒgƒŒ[ƒg: %u.%u kbps\n", bitrate / 1000, bitrate % 1000);
+		printf("  ãƒ“ãƒƒãƒˆãƒ¬ãƒ¼ãƒˆ: %u.%u kbps\n", bitrate / 1000, bitrate % 1000);
 		while (aacheader) {
 			if (aacheader->frame == 0) {
-				printf("  ƒo[ƒWƒ‡ƒ“:   %s\n", aacheader->version ? "MPEG-2 AAC" : "MPEG-4 AAC");
+				printf("  ãƒãƒ¼ã‚¸ãƒ§ãƒ³:   %s\n", aacheader->version ? "MPEG-2 AAC" : "MPEG-4 AAC");
 				if (aacheader->profile == 0) {
-					printf("  ƒvƒƒtƒ@ƒCƒ‹: Main\n");
+					printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: Main\n");
 					editok = FALSE;
 				} else if (aacheader->profile == 1) {
-					printf("  ƒvƒƒtƒ@ƒCƒ‹: LC (Low Complexity)\n");
+					printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: LC (Low Complexity)\n");
 				} else if (aacheader->profile == 2) {
-					printf("  ƒvƒƒtƒ@ƒCƒ‹: SSR (Scalable Sampling Rate)\n");
+					printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: SSR (Scalable Sampling Rate)\n");
 					editok = FALSE;
 				} else {
-					printf("  ƒvƒƒtƒ@ƒCƒ‹: •s–¾\n");
+					printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: ä¸æ˜\n");
 					editok = FALSE;
 				}
-				printf("  ƒTƒ“ƒvƒŠƒ“ƒOü”g”: %u Hz\n", aacheader->sampling_rate);
+				printf("  ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°å‘¨æ³¢æ•°: %u Hz\n", aacheader->sampling_rate);
 				if (aacheader->channel == 0)
-					printf("  ƒ`ƒƒƒ“ƒlƒ‹:   0 ch (“ñd‰¹º?)\n");
+					printf("  ãƒãƒ£ãƒ³ãƒãƒ«:   0 ch (äºŒé‡éŸ³å£°?)\n");
 				else if (aacheader->channel >= 6)
-					printf("  ƒ`ƒƒƒ“ƒlƒ‹:   %u.1 ch\n", aacheader->channel - 1);
+					printf("  ãƒãƒ£ãƒ³ãƒãƒ«:   %u.1 ch\n", aacheader->channel - 1);
 				else
-					printf("  ƒ`ƒƒƒ“ƒlƒ‹:   %u ch\n", aacheader->channel);
+					printf("  ãƒãƒ£ãƒ³ãƒãƒ«:   %u ch\n", aacheader->channel);
 			} else {
-				printf("%uƒtƒŒ[ƒ€ˆÈ~:\n", aacheader->frame);
+				printf("%uãƒ•ãƒ¬ãƒ¼ãƒ ä»¥é™:\n", aacheader->frame);
 				if (aacheader->version != aacheaderprev->version)
-					printf("  ƒo[ƒWƒ‡ƒ“:   %s\n", aacheader->version ? "MPEG-2 AAC" : "MPEG-4 AAC");
+					printf("  ãƒãƒ¼ã‚¸ãƒ§ãƒ³:   %s\n", aacheader->version ? "MPEG-2 AAC" : "MPEG-4 AAC");
 				if (aacheader->profile != aacheaderprev->profile) {
 					if (aacheader->profile == 0) {
-						printf("  ƒvƒƒtƒ@ƒCƒ‹: Main\n");
+						printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: Main\n");
 						editok = FALSE;
 					} else if (aacheader->profile == 1) {
-						printf("  ƒvƒƒtƒ@ƒCƒ‹: LC (Low Complexity)\n");
+						printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: LC (Low Complexity)\n");
 					} else if (aacheader->profile == 2) {
-						printf("  ƒvƒƒtƒ@ƒCƒ‹: SSR (Scalable Sampling Rate)\n");
+						printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: SSR (Scalable Sampling Rate)\n");
 						editok = FALSE;
 					} else {
-						printf("  ƒvƒƒtƒ@ƒCƒ‹: •s–¾\n");
+						printf("  ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«: ä¸æ˜\n");
 						editok = FALSE;
 					}
 				}
 				if (aacheader->sampling_rate != aacheaderprev->sampling_rate)
-					printf("  ƒTƒ“ƒvƒŠƒ“ƒOü”g”: %u Hz\n", aacheader->sampling_rate);
+					printf("  ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°å‘¨æ³¢æ•°: %u Hz\n", aacheader->sampling_rate);
 				if (aacheader->channel != aacheaderprev->channel) {
 					if (aacheader->channel == 0)
-						printf("  ƒ`ƒƒƒ“ƒlƒ‹:   0 ch (“ñd‰¹º?)\n");
+						printf("  ãƒãƒ£ãƒ³ãƒãƒ«:   0 ch (äºŒé‡éŸ³å£°?)\n");
 					else if (aacheader->channel >= 6)
-						printf("  ƒ`ƒƒƒ“ƒlƒ‹:   %u.1 ch\n", aacheader->channel - 1);
+						printf("  ãƒãƒ£ãƒ³ãƒãƒ«:   %u.1 ch\n", aacheader->channel - 1);
 					else
-						printf("  ƒ`ƒƒƒ“ƒlƒ‹:   %u ch\n", aacheader->channel);
+						printf("  ãƒãƒ£ãƒ³ãƒãƒ«:   %u ch\n", aacheader->channel);
 				}
 			}
 			if (aacheader->sampling_rate != 48000)
@@ -140,15 +140,15 @@ int main(int argc, char *argv[])
 	}
 
 	if (!editok) {
-		printf("•ÒW”ñ‘Î‰ƒtƒ@ƒCƒ‹‚Å‚·B\n");
+		printf("ç·¨é›†éå¯¾å¿œãƒ•ã‚¡ã‚¤ãƒ«ã§ã™ã€‚\n");
 	} else if (options.outputpath) {
 		if (!trimanalyze()) {
 			int delay, allaacframe;
 
 			editinfotop = (EDITINFO *)calloc(1, sizeof(EDITINFO));
 			if (editinfotop == NULL)
-				errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
-			//Œ…‚ ‚Ó‚êƒ`ƒFƒbƒN
+				errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
+			//æ¡ã‚ãµã‚Œãƒã‚§ãƒƒã‚¯
 			allaacframe = getallaacframe();
 			delay = options.delay * 46875 / 1000000 * CORRECTION;
 			if (delay > 0) {
@@ -225,7 +225,7 @@ static int getoptions(int argc, char *argv[])
 				i++;
 				if (i >= argc)
 					return 0;
-				//ƒƒ“ƒhƒC‚Ì‚ÅŒÅ’èƒ`ƒFƒbƒN
+				//ãƒ¡ãƒ³ãƒ‰ã‚¤ã®ã§å›ºå®šãƒã‚§ãƒƒã‚¯
 				if (strncmp(argv[i], "29.97", 5) == 0)
 					options.videoframerate = 29970;
 				else if (strncmp(argv[i], "59.94", 5) == 0)
@@ -250,7 +250,7 @@ static int getoptions(int argc, char *argv[])
 				options.inputfile++;
 				ret = 1;
 			} else {
-				sprintf(buf, "“ü—Íƒtƒ@ƒCƒ‹‚ÍÅ‘å %d ƒtƒ@ƒCƒ‹‚Ü‚Å‚Å‚·B", MAX_INPUT_FILE);
+				sprintf(buf, "å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«ã¯æœ€å¤§ %d ãƒ•ã‚¡ã‚¤ãƒ«ã¾ã§ã§ã™ã€‚", MAX_INPUT_FILE);
 				errorexit(buf, TRUE);
 			}
 		}
@@ -296,10 +296,10 @@ static int getoptions(int argc, char *argv[])
 		}
 
 		if ( nDelay == 0 ) {
-			errorexit("“ü—Íƒtƒ@ƒCƒ‹ã‘‚«–h~‚Ìˆ×’†~‚µ‚Ü‚·\n", FALSE);
+			errorexit("å…¥åŠ›ãƒ•ã‚¡ã‚¤ãƒ«ä¸Šæ›¸ãé˜²æ­¢ã®ç‚ºä¸­æ­¢ã—ã¾ã™\n", FALSE);
 		}
 		if ( nPosBegin < 0 ) {
-			errorexit("-xƒIƒvƒVƒ‡ƒ“‚ªw’è‚³‚ê‚Ü‚µ‚½‚ªAƒtƒ@ƒCƒ‹–¼‚É\"-**ms\"‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB\n", FALSE);
+			errorexit("-xã‚ªãƒ—ã‚·ãƒ§ãƒ³ãŒæŒ‡å®šã•ã‚Œã¾ã—ãŸãŒã€ãƒ•ã‚¡ã‚¤ãƒ«åã«\"-**ms\"ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚\n", FALSE);
 		}
 		strcpy( szOut, pszFirstInput ) ;
 		szOut[nPosBegin] = '\0' ;
@@ -307,7 +307,7 @@ static int getoptions(int argc, char *argv[])
 		strcat( szOut, &pszFirstInput[nPosEnd+1] ) ;
 		options.outputpath = szOut ;
 		options.delay = nDelay ;
-		printf( "-xƒIƒvƒVƒ‡ƒ“‚É‚æ‚èAˆÈ‰º‚ÌƒIƒvƒVƒ‡ƒ“‚ğ©“®“I‚É’Ç‰Á\n" ) ;
+		printf( "-xã‚ªãƒ—ã‚·ãƒ§ãƒ³ã«ã‚ˆã‚Šã€ä»¥ä¸‹ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’è‡ªå‹•çš„ã«è¿½åŠ \n" ) ;
 		printf( "    -d %d\n", nDelay ) ;
 		printf( "    -o \"%s\"\n", szOut ) ;
 	}
@@ -319,16 +319,16 @@ static void usage(void)
 	printf(
 	"Usage: aacedit [options] -t xxxx -o <outfile> <infiles>\n"
 	"\n"
-	"ƒIƒvƒVƒ‡ƒ“:\n"
-	"  -t xxxx      AviSynth ƒXƒNƒŠƒvƒgƒtƒ@ƒCƒ‹‚©‚ç\n"
-	"               Trim ‚Ån‚Ü‚éˆês‚ğŒŸõ‚µ‚Ä“Ç‚İ‚İ\n"
-	"               ‚Ü‚½‚ÍƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚©‚ç Trim î•ñ‚ğ“ü—Í\n"
-	"  -o <outfile> o—Íƒtƒ@ƒCƒ‹\n"
-	"  -d xxxx      ’x‰„•â³ (ms’PˆÊ)\n"
-	"  -a           AAC ƒtƒŒ[ƒ€‚ğ’¼Úw’è\n"
-	"  -f xxxx      “®‰æ‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg‚ğw’è (29.97 or 59.94)\n"
-	"  -x           Å‰‚Ì<infiles>‚Ìƒtƒ@ƒCƒ‹–¼‚©‚ç-o/-dƒIƒvƒVƒ‡ƒ“‚ğ©“®w’è\n"
-	"  -h or -?     ƒwƒ‹ƒv\n"
+	"ã‚ªãƒ—ã‚·ãƒ§ãƒ³:\n"
+	"  -t xxxx      AviSynth ã‚¹ã‚¯ãƒªãƒ—ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰\n"
+	"               Trim ã§å§‹ã¾ã‚‹ä¸€è¡Œã‚’æ¤œç´¢ã—ã¦èª­ã¿è¾¼ã¿\n"
+	"               ã¾ãŸã¯ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã‹ã‚‰ Trim æƒ…å ±ã‚’å…¥åŠ›\n"
+	"  -o <outfile> å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«\n"
+	"  -d xxxx      é…å»¶è£œæ­£ (mså˜ä½)\n"
+	"  -a           AAC ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç›´æ¥æŒ‡å®š\n"
+	"  -f xxxx      å‹•ç”»ã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’æŒ‡å®š (29.97 or 59.94)\n"
+	"  -x           æœ€åˆã®<infiles>ã®ãƒ•ã‚¡ã‚¤ãƒ«åã‹ã‚‰-o/-dã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’è‡ªå‹•æŒ‡å®š\n"
+	"  -h or -?     ãƒ˜ãƒ«ãƒ—\n"
 	);
 	return;
 }
@@ -356,7 +356,7 @@ static int avsopen(const char *filepath)
 	if (strcmp(tmpstr, "trim(") != 0) {
 		hAvsFile = open(filepath, O_RDONLY);
 		if (hAvsFile < 0) {
-			errorexit("AviSynth ƒXƒNƒŠƒvƒgƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+			errorexit("AviSynth ã‚¹ã‚¯ãƒªãƒ—ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 		}
 	}
 	return 1;
@@ -377,7 +377,7 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 		return 0;
 	hFile = open(filepath, O_RDONLY | O_BINARY);
 	if (hFile < 0) {
-		errorexit("AAC ƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+		errorexit("AAC ãƒ•ã‚¡ã‚¤ãƒ«ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 	}
 
 	lseek(hFile, 0, SEEK_END);
@@ -386,7 +386,7 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 	aacdata->data = (unsigned char *)calloc(filesize, sizeof(char));
 	aacdata->index = (unsigned int *)calloc(indexchunk, sizeof(int));
 	if (aacdata->data == NULL || aacdata->index == NULL)
-		errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+		errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 	readchunk = read(hFile, buffer, readchunk);
 	while (readchunk > 0) {
 		p = buffer;
@@ -395,14 +395,14 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 			if (*p == 0xFF && (*(p+1) & 0xF6) == 0xF0) {
 				aacdata->index[aacframecnt] = readbyte;
 				aac_frame_length = bitstoint(p + 3, 6, 13);
-				if (readbyte + aac_frame_length > filesize) { //I’[‚Ílength‚æ‚è­‚È‚¢‚±‚Æ‚ª‚ ‚é
+				if (readbyte + aac_frame_length > filesize) { //çµ‚ç«¯ã¯lengthã‚ˆã‚Šå°‘ãªã„ã“ã¨ãŒã‚ã‚‹
 					aac_frame_length = filesize - readbyte;
 				}
 				tmpchannel = bitstoint(p, 23, 3);
 				if (channel != tmpchannel) {
 					tmpaacheader = (AACHEADER *)calloc(1, sizeof(AACHEADER));
 					if (tmpaacheader == NULL)
-						errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+						errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 					tmpaacheader->frame = aacframecnt;
 					tmpaacheader->version = bitstoint(p, 12, 1);
 					tmpaacheader->profile = bitstoint(p, 16, 2);
@@ -426,7 +426,7 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 					indexchunk += INDEX_CHUNK_SIZE;
 					aacdata->index = (unsigned int *)realloc(aacdata->index, indexchunk * sizeof(unsigned int));
 					if (aacdata->index == NULL) {
-						errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+						errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 					}
 				}
 				readbyte += aac_frame_length;
@@ -436,15 +436,15 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 					lseek(hFile, readbyte, 0);
 					break;
 				}
-				p += aac_frame_length; //ƒtƒŒ[ƒ€•ªˆÚ“®
+				p += aac_frame_length; //ãƒ•ãƒ¬ãƒ¼ãƒ åˆ†ç§»å‹•
 			} else {
 				if (aacframecnt != 0)
-					printf("%u ƒtƒŒ[ƒ€–Ú‚Ìƒwƒbƒ_[î•ñ‚ª³‚µ‚­‚ ‚è‚Ü‚¹‚ñB\n", aacframecnt);
+					printf("%u ãƒ•ãƒ¬ãƒ¼ãƒ ç›®ã®ãƒ˜ãƒƒãƒ€ãƒ¼æƒ…å ±ãŒæ­£ã—ãã‚ã‚Šã¾ã›ã‚“ã€‚\n", aacframecnt);
 				ptmp = min(p + 1024, plast);
 				while (p < ptmp && !(*p == 0xFF && (*(p+1) & 0xF6) == 0xF0)) p++;
 				if (p == ptmp) {
 					close(hFile);
-					errorexit("AAC ADTS ƒtƒ@ƒCƒ‹‚Å‚Í‚ ‚è‚Ü‚¹‚ñB", FALSE);
+					errorexit("AAC ADTS ãƒ•ã‚¡ã‚¤ãƒ«ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚", FALSE);
 				}
 				ret = 2;
 			}
@@ -453,7 +453,7 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 	}
 	close(hFile);
 	if (aacframecnt == 0) {
-		errorexit("AAC ADTS ƒtƒ@ƒCƒ‹‚Å‚Í‚ ‚è‚Ü‚¹‚ñB", FALSE);
+		errorexit("AAC ADTS ãƒ•ã‚¡ã‚¤ãƒ«ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚", FALSE);
 	}
 	aacdata->index[aacframecnt] = filesize;
 	aacdata->size = filesize;
@@ -476,7 +476,7 @@ int trimanalyze(void)
 		len = strlen(options.avspath);
 		p = allocbuf = (char *)calloc(len + 1, sizeof(char));
 		if (allocbuf == NULL)
-			errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+			errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 		plast = options.avspath + len;
 		for (ptmp = options.avspath; ptmp < plast; ptmp++) {
 			if (*ptmp != ' ' && *ptmp != '\t') {
@@ -492,7 +492,7 @@ int trimanalyze(void)
 		lseek(hAvsFile, 0, SEEK_SET);
 		p = allocbuf = (char *)calloc(filesize + 1, sizeof(unsigned char));
 		if (allocbuf == NULL)
-			errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+			errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 		readchunk = read(hAvsFile, buffer, BUFFER_SIZE);
 		while (readchunk > 0) {
 			plast = buffer + readchunk;
@@ -535,7 +535,7 @@ int trimanalyze(void)
 
 			editip = (EDITINFO *)calloc(1, sizeof(EDITINFO));
 			if (editip == NULL)
-				errorexit("ƒƒ‚ƒŠŠm•Û‚É¸”s‚µ‚Ü‚µ‚½B", FALSE);
+				errorexit("ãƒ¡ãƒ¢ãƒªç¢ºä¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", FALSE);
 			endnumzero = (endnum == 0);
 			if (!endnumzero) {
 				if (endnum < 0)
@@ -549,7 +549,7 @@ int trimanalyze(void)
 			endnum = videotoaacframe(endnum);
 			delay = options.delay * 46875 / 1000000 * CORRECTION;
 			startnum -= delay;
-			//Œ…‚ ‚Ó‚êƒ`ƒFƒbƒN
+			//æ¡ã‚ãµã‚Œãƒã‚§ãƒƒã‚¯
 			if (startnum >= allaacframe)
 				editip->startframe = allaacframe - 1;
 			else if (startnum < 0)
@@ -565,7 +565,7 @@ int trimanalyze(void)
 				else if (endnum > startnum)
 					editip->endframe = endnum;
 			 	else
-					editip->startframe = editip->endframe = 0xFFFFFFFF; //—áŠO
+					editip->startframe = editip->endframe = 0xFFFFFFFF; //ä¾‹å¤–
 			}
 			editip->next = NULL;
 			if (!editinfotop) {
@@ -575,7 +575,7 @@ int trimanalyze(void)
 				editinfo = editip;
 			}
 			while (p < plast && *p != ')') p++;
-		} else if (*p == '\n' && *(p + 1) == '\\') { //‘±‚¯‚ÄTrim‚ğŒŸõ
+		} else if (*p == '\n' && *(p + 1) == '\\') { //ç¶šã‘ã¦Trimã‚’æ¤œç´¢
 			p++;
 		} else if (*p != '+') {
 			if (editinfotop)
@@ -602,7 +602,7 @@ int aacwrite(void)
 	if (!editinfotop)
 		return 0;
 
-	printf("o—Í’†...\n");
+	printf("å‡ºåŠ›ä¸­...\n");
 	framenum = writebyte = 0;
 	editip = editinfotop;
 	while (editip) {
@@ -652,7 +652,7 @@ int aacwrite(void)
 	}
 	close(hWriteAACFile);
 	hWriteAACFile = -1;
-	printf("\no—ÍƒTƒCƒY: %d ƒoƒCƒg (%ldƒtƒŒ[ƒ€)\n", writebyte, framenum);
+	printf("\nå‡ºåŠ›ã‚µã‚¤ã‚º: %d ãƒã‚¤ãƒˆ (%ldãƒ•ãƒ¬ãƒ¼ãƒ )\n", writebyte, framenum);
 	return 1;
 }
 
@@ -699,7 +699,7 @@ unsigned long getallaacframe(void)
 	return ret;
 }
 
-//ƒrƒfƒIƒtƒŒ[ƒ€‚©‚çAACƒtƒŒ[ƒ€‚ğŒvZ
+//ãƒ“ãƒ‡ã‚ªãƒ•ãƒ¬ãƒ¼ãƒ ã‹ã‚‰AACãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¨ˆç®—
 long videotoaacframe(long vframe)
 {
 	double ret, m;
@@ -726,7 +726,7 @@ long videotoaacframe(long vframe)
 
 void errorexit(const char *errorstr, int showusage)
 {
-	fprintf(stderr, "ƒGƒ‰[: %s\n", errorstr);
+	fprintf(stderr, "ã‚¨ãƒ©ãƒ¼: %s\n", errorstr);
 	if (showusage) usage();
 	aacrelease();
 	if (hAvsFile) close(hAvsFile);
@@ -734,7 +734,7 @@ void errorexit(const char *errorstr, int showusage)
 	exit(1);
 }
 
-//ƒrƒbƒg•ÏŠ·ŠÖ”
+//ãƒ“ãƒƒãƒˆå¤‰æ›é–¢æ•°
 unsigned long bitstoint(unsigned char *data, unsigned int shift, unsigned int n)
 {
 	unsigned long ret;
