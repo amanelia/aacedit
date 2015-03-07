@@ -2,12 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <windows.h>
-#include <shlwapi.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "aacedit.h"
-
-#pragma comment (lib, "shlwapi.lib")
+#define TRUE 1
+#define FALSE 0
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define _MAX_PATH 260
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+typedef int HANDLE;
+typedef unsigned long DWORD;
 
 //#define CORRECTION 108 / 100
 #define CORRECTION 1
@@ -43,8 +53,8 @@ int main(int argc, char *argv[])
 
 	if (options.outputpath) {
 		avsopen(options.avspath);
-		hWriteAACFile = CreateFile((LPCSTR)options.outputpath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (hWriteAACFile == INVALID_HANDLE_VALUE) {
+		hWriteAACFile = open(options.outputpath, (O_RDWR | O_BINARY | O_CREAT), (S_IRUSR | S_IWUSR));
+		if (hWriteAACFile < 0) {
 			errorexit("出力ファイルオープンに失敗しました。", FALSE);
 			return 0;
 		}
@@ -60,7 +70,11 @@ int main(int argc, char *argv[])
 		}
 		aacheader = aacdata->header;
 		printf("%s の情報:\n", options.inputpath[i]);
+#if !defined(_WIN32)
+		printf("  サイズ:       %zu バイト\n", aacdata->size);
+#else
 		printf("  サイズ:       %u バイト\n", aacdata->size);
+#endif
 		printf("  フレーム:     %u フレーム\n", aacdata->framecnt);
 		second = (unsigned int)((double)aacdata->framecnt / ((double)aacheader->sampling_rate / 1024));
 		printf("  時間:         %02u:%02u:%02u\n", second / 3600, second / 60 % 60, second % 60);
@@ -340,8 +354,8 @@ static int avsopen(const char *filepath)
 	}
 	*ptmp = '\0';
 	if (strcmp(tmpstr, "trim(") != 0) {
-		hAvsFile = CreateFile((LPCSTR)filepath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (hAvsFile == INVALID_HANDLE_VALUE) {
+		hAvsFile = open(filepath, O_RDONLY);
+		if (hAvsFile < 0) {
 			errorexit("AviSynth スクリプトファイルの読み込みに失敗しました。", FALSE);
 		}
 	}
@@ -361,17 +375,19 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 
 	if (!aacdata || !filepath)
 		return 0;
-	hFile = CreateFile((LPCSTR)filepath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) {
+	hFile = open(filepath, O_RDONLY | O_BINARY);
+	if (hFile < 0) {
 		errorexit("AAC ファイルの読み込みに失敗しました。", FALSE);
 	}
 
-	filesize = GetFileSize(hFile, NULL);
+	lseek(hFile, 0, SEEK_END);
+	filesize = lseek(hFile, 0, SEEK_CUR);
+	lseek(hFile, 0, SEEK_SET);
 	aacdata->data = (unsigned char *)calloc(filesize, sizeof(char));
 	aacdata->index = (unsigned int *)calloc(indexchunk, sizeof(int));
 	if (aacdata->data == NULL || aacdata->index == NULL)
 		errorexit("メモリ確保に失敗しました。", FALSE);
-	ReadFile(hFile, buffer, readchunk, &readchunk, NULL);
+	readchunk = read(hFile, buffer, readchunk);
 	while (readchunk > 0) {
 		p = buffer;
 		plast = p + readchunk - 7;
@@ -417,7 +433,7 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 				if (filesize <= readbyte)
 					break;
 				else if ((p + aac_frame_length > plast - FRAME_BYTE_LIMIT) && readchunk >= BUFFER_SIZE) {
-					SetFilePointer(hFile, readbyte, NULL, FILE_BEGIN);
+					lseek(hFile, readbyte, 0);
 					break;
 				}
 				p += aac_frame_length; //フレーム分移動
@@ -427,15 +443,15 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 				ptmp = min(p + 1024, plast);
 				while (p < ptmp && !(*p == 0xFF && (*(p+1) & 0xF6) == 0xF0)) p++;
 				if (p == ptmp) {
-					CloseHandle(hFile);
+					close(hFile);
 					errorexit("AAC ADTS ファイルではありません。", FALSE);
 				}
 				ret = 2;
 			}
 		}
-		ReadFile(hFile, buffer, readchunk, &readchunk, NULL);
+		readchunk = read(hFile, buffer, readchunk);
 	}
-	CloseHandle(hFile);
+	close(hFile);
 	if (aacframecnt == 0) {
 		errorexit("AAC ADTS ファイルではありません。", FALSE);
 	}
@@ -471,11 +487,13 @@ int trimanalyze(void)
 		*p = '\0';
 		plast = p;
 	} else {
-		filesize = GetFileSize(hAvsFile, NULL);
+		lseek(hAvsFile, 0, SEEK_END);
+		filesize = lseek(hAvsFile, 0, SEEK_CUR);
+		lseek(hAvsFile, 0, SEEK_SET);
 		p = allocbuf = (char *)calloc(filesize + 1, sizeof(unsigned char));
 		if (allocbuf == NULL)
 			errorexit("メモリ確保に失敗しました。", FALSE);
-		ReadFile(hAvsFile, buffer, BUFFER_SIZE, &readchunk, NULL);
+		readchunk = read(hAvsFile, buffer, BUFFER_SIZE);
 		while (readchunk > 0) {
 			plast = buffer + readchunk;
 			for (ptmp = buffer; ptmp < plast; ptmp++) {
@@ -488,10 +506,10 @@ int trimanalyze(void)
 					p++;
 				}
 			}
-			ReadFile(hAvsFile, buffer, BUFFER_SIZE, &readchunk, NULL);
+			readchunk = read(hAvsFile, buffer, BUFFER_SIZE);
 		}
-		CloseHandle(hAvsFile);
-		hAvsFile = NULL;
+		close(hAvsFile);
+		hAvsFile = -1;
 		plast = p;
 	}
 	p = allocbuf;
@@ -622,7 +640,7 @@ int aacwrite(void)
 				writechunk = aacdata->index[endframe];
 				writeframe += endframe;
 			}
-			WriteFile(hWriteAACFile, writebuf, writechunk, &writechunk, NULL);
+			write(hWriteAACFile, writebuf, writechunk);
 			writebyte += writechunk;
 			if (writeframe >= editip->endframe - editip->startframe)
 				break;
@@ -632,9 +650,9 @@ int aacwrite(void)
 		if (editip != NULL)
 			putchar('+');
 	}
-	CloseHandle(hWriteAACFile);
-	hWriteAACFile = NULL;
-	printf("\n出力サイズ: %u バイト (%uフレーム)\n", writebyte, framenum);
+	close(hWriteAACFile);
+	hWriteAACFile = -1;
+	printf("\n出力サイズ: %d バイト (%ldフレーム)\n", writebyte, framenum);
 	return 1;
 }
 
@@ -711,8 +729,8 @@ void errorexit(const char *errorstr, int showusage)
 	fprintf(stderr, "エラー: %s\n", errorstr);
 	if (showusage) usage();
 	aacrelease();
-	if (hAvsFile) CloseHandle(hAvsFile);
-	if (hWriteAACFile) CloseHandle(hWriteAACFile);
+	if (hAvsFile) close(hAvsFile);
+	if (hWriteAACFile) close(hWriteAACFile);
 	exit(1);
 }
 
@@ -722,7 +740,7 @@ unsigned long bitstoint(unsigned char *data, unsigned int shift, unsigned int n)
 	unsigned long ret;
 
 	memcpy(&ret, data, sizeof(unsigned long));
-	ret = ret << 24 | ret << 8 & 0x00FF0000 | ret >> 8 & 0x0000FF00 | ret >> 24 & 0x000000FF;
+	ret = ret << 24 | ((ret << 8) & 0x00FF0000) | ((ret >> 8) & 0x0000FF00) | ((ret >> 24) & 0x000000FF);
 	ret = (ret >> (32 - shift - n));
 	ret &= 0xFFFFFFFF & ((1 << n) - 1);
 	return ret;
