@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -12,6 +13,9 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define _MAX_PATH 260
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 typedef int HANDLE;
 typedef unsigned long DWORD;
 
@@ -49,7 +53,7 @@ int main(int argc, char *argv[])
 
 	if (options.outputpath) {
 		avsopen(options.avspath);
-		hWriteAACFile = open(options.outputpath, (O_RDWR | O_CREAT), (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH));
+		hWriteAACFile = open(options.outputpath, (O_RDWR | O_BINARY | O_CREAT), (S_IRUSR | S_IWUSR));
 		if (hWriteAACFile < 0) {
 			errorexit("出力ファイルオープンに失敗しました。", FALSE);
 			return 0;
@@ -66,7 +70,11 @@ int main(int argc, char *argv[])
 		}
 		aacheader = aacdata->header;
 		printf("%s の情報:\n", options.inputpath[i]);
-		printf("  サイズ:       %ld バイト\n", aacdata->size);
+#if !defined(_WIN32)
+		printf("  サイズ:       %zu バイト\n", aacdata->size);
+#else
+		printf("  サイズ:       %u バイト\n", aacdata->size);
+#endif
 		printf("  フレーム:     %u フレーム\n", aacdata->framecnt);
 		second = (unsigned int)((double)aacdata->framecnt / ((double)aacheader->sampling_rate / 1024));
 		printf("  時間:         %02u:%02u:%02u\n", second / 3600, second / 60 % 60, second % 60);
@@ -367,7 +375,7 @@ int aacopen(const char *filepath, AACDATA *aacdata)
 
 	if (!aacdata || !filepath)
 		return 0;
-	hFile = open(filepath, O_RDONLY);
+	hFile = open(filepath, O_RDONLY | O_BINARY);
 	if (hFile < 0) {
 		errorexit("AAC ファイルの読み込みに失敗しました。", FALSE);
 	}
